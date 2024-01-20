@@ -1,3 +1,4 @@
-import { server } from '$lib/boardgame_server';
+import { createLobby } from '$lib/lobby_manager';
 
-server.run(8000);
+const lobbyId = createLobby();
+console.log(lobbyId);

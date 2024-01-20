@@ -13,6 +13,7 @@
 		"format": "prettier --write ."
 	},
 	"devDependencies": {
+		"@carlosv2/adapter-node-ws": "^0.1.4",
 		"@sveltejs/kit": "^2.4.1",
 		"@sveltejs/vite-plugin-svelte": "^3.0.0",
 		"@types/eslint": "8.56.0",
@@ -35,9 +36,6 @@
 	},
 	"type": "module",
 	"dependencies": {
-		"@sveltejs/adapter-node": "^4.0.0",
-		"@types/uuid": "^9.0.7",
-		"boardgame.io": "^0.50.2",
-		"uuid": "^9.0.1"
+		"nanoid": "^5.0.4"
 	}
 }

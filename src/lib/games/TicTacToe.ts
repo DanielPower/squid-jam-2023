@@ -1,5 +1,4 @@
-import type { Game } from 'boardgame.io';
-import { INVALID_MOVE } from 'boardgame.io/core';
+import type { Game } from '$lib/game';
 
 const LINES = [
 	[0, 1, 2],
@@ -12,36 +11,58 @@ const LINES = [
 	[2, 4, 6]
 ];
 
-export interface TicTacToeState {
-	cells: (string | null)[];
+export type TicTacToeState = {
+	cells: (number | null)[];
 	winner: string | null;
-}
+	currentPlayer: number;
+};
 
-export const TicTacToe: Game<TicTacToeState> = {
-	setup: () => ({
-		cells: Array(9).fill(null),
-		winner: null
-	}),
-	moves: {
-		clickCell: ({ G, playerID }, id: number) => {
-			if (G.cells[id] !== null) {
-				return INVALID_MOVE;
-			}
-			G.cells[id] = playerID;
-		}
-	},
-	turn: {
-		minMoves: 1,
-		maxMoves: 1
-	},
-	endIf: ({ G, ctx }) => {
-		for (const line of LINES) {
-			if (line.every((cell) => G.cells[cell] === ctx.currentPlayer)) {
-				return { winner: ctx.currentPlayer };
-			}
-		}
-		if (G.cells.every((cell) => cell !== null)) {
-			return { draw: true };
+export type TicTacToePlayerView = TicTacToeState;
+
+const checkWin = (state: TicTacToeState) => {
+	for (const line of LINES) {
+		if (line.every((cell) => state.cells[cell] === state.currentPlayer)) {
+			return { winner: state.currentPlayer };
 		}
 	}
+	if (state.cells.every((cell) => cell !== null)) {
+		return { draw: true };
+	}
+};
+
+export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
+	type Listener = (view: TicTacToePlayerView) => void;
+	const listeners = new Set<[number, Listener]>();
+	let state: TicTacToeState = {
+		currentPlayer: 0,
+		cells: Array(9).fill(null),
+		winner: null
+	};
+	const getPlayerView = (playerId: number) => state;
+	const subscribe = (playerId: number, listener: () => void) => {
+		listeners.add([playerId, listener]);
+	};
+	const getState = () => state;
+	const setState = (newState: TicTacToeState) => {
+		state = newState;
+		for (const [playerId, listener] of listeners) {
+			listener(getPlayerView(playerId));
+		}
+	};
+	const actions = {
+		takeCell: (playerId: number, id: number) => {
+			if (state.cells[id] !== null) {
+				return;
+			}
+			state.cells[id] = playerId;
+		}
+	};
+
+	return {
+		actions,
+		getState,
+		setState,
+		subscribe,
+		getPlayerView
+	};
 };
