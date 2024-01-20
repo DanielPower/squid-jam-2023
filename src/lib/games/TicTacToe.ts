@@ -1,7 +1,5 @@
-import { Client } from 'boardgame.io/client';
 import type { Game } from 'boardgame.io';
 import { INVALID_MOVE } from 'boardgame.io/core';
-import { writable } from 'svelte/store';
 
 const LINES = [
 	[0, 1, 2],
@@ -47,8 +45,3 @@ export const TicTacToe: Game<TicTacToeState> = {
 		}
 	}
 };
-
-export const gameClient = Client({ game: TicTacToe });
-export const gameState = writable(gameClient.getState()!);
-gameClient.subscribe((newState) => gameState.set(newState!));
-gameClient.start();

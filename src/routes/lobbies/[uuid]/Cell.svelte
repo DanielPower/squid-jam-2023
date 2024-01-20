@@ -1,6 +1,8 @@
 <script lang="ts">
-	import { gameClient, gameState } from '$lib/game';
+	import { getContext } from 'svelte';
+
 	export let id: number;
+	const gameState = getContext('gameState');
 	$: playerID = $gameState.G.cells[id];
 </script>
 
