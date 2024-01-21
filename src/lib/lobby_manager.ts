@@ -1,8 +1,8 @@
 import { nanoid } from 'nanoid';
-import { createGame } from './games/TicTacToe';
+import { createGame, type TicTacToePlayerView, type TicTacToeState } from './games/TicTacToe';
 import type { Game } from './game';
 
-export const lobbies = new Map<string, Game<any, any>>();
+export const lobbies = new Map<string, Game<TicTacToeState, TicTacToePlayerView>>();
 
 export const createLobby = () => {
 	const lobbyId = nanoid();

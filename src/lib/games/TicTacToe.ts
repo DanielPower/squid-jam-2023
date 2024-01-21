@@ -39,6 +39,19 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 		winner: null
 	};
 	const getPlayerView = (playerId: number) => state;
+	const getPlayerActions = (playerId: number) => {
+		if (playerId !== state.currentPlayer) {
+			return {
+				takeCell: (id: number) => {
+					if (state.cells[id] !== null) {
+						return;
+					}
+					state.cells[id] = playerId;
+				}
+			};
+		}
+		return {};
+	};
 	const subscribe = (playerId: number, listener: () => void) => {
 		listeners.add([playerId, listener]);
 	};
@@ -49,20 +62,12 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 			listener(getPlayerView(playerId));
 		}
 	};
-	const actions = {
-		takeCell: (playerId: number, id: number) => {
-			if (state.cells[id] !== null) {
-				return;
-			}
-			state.cells[id] = playerId;
-		}
-	};
 
 	return {
-		actions,
 		getState,
 		setState,
 		subscribe,
+		getPlayerActions,
 		getPlayerView
 	};
 };

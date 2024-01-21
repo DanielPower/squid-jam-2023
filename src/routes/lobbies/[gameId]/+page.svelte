@@ -1,17 +1,12 @@
 <script lang="ts">
-	import Cell from './Cell.svelte';
 	import type { PageData } from './$types';
-	import { writable } from 'svelte/store';
-	import { setContext } from 'svelte';
+	import Cell from './Cell.svelte';
 
 	export let data: PageData;
-	let gameState = writable(data.initialPlayerView);
-	setContext('gameState', gameState);
-
-	$: console.log(gameState);
+	const gameState = data.gameState;
 </script>
 
-{#if gameState == null}
+{#if $gameState == null}
 	<div>Loading...</div>
 {:else}
 	<div class="absolute inset-0 flex flex-col items-center justify-center">
@@ -19,7 +14,7 @@
 			{#each { length: 3 } as _, i}
 				<div class="flex">
 					{#each { length: 3 } as _, j}
-						<Cell id={i * 3 + j} />
+						<Cell {gameState} id={i * 3 + j} />
 					{/each}
 				</div>
 			{/each}
