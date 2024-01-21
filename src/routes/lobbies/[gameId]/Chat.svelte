@@ -6,7 +6,7 @@
 </script>
 
 <div class="flex flex-col">
-	{#each $gameState.messages as { user, message }}
-		<p>{user}: {message}</p>
+	{#each $gameState.messages as { userId, message }}
+		<p>{userId}: {message}</p>
 	{/each}
 </div>

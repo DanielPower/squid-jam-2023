@@ -10,7 +10,7 @@ const LINES = [
 	[1, 4, 7],
 	[2, 5, 8],
 	[0, 4, 8],
-	[2, 4, 6]
+	[2, 4, 6],
 ];
 
 export type TicTacToeState = {
@@ -19,19 +19,19 @@ export type TicTacToeState = {
 	users: Array<string>;
 	turnIndex: number;
 	messages: Array<{
-		user: string;
+		userId: string;
 		message: string;
 	}>;
 };
 
 export type TicTacToePlayerView = TicTacToeState;
 
-const currentPlayer = (state: TicTacToeState) => state.users[state.turnIndex];
+const currentUser = (state: TicTacToeState) => state.users[state.turnIndex];
 
 const checkWin = (state: TicTacToeState) => {
 	for (const line of LINES) {
-		if (line.every((cell) => state.cells[cell] === currentPlayer(state))) {
-			return { winner: currentPlayer(state) };
+		if (line.every((cell) => state.cells[cell] === currentUser(state))) {
+			return { winner: currentUser(state) };
 		}
 	}
 	if (state.cells.every((cell) => cell !== null)) {
@@ -47,22 +47,27 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 		cells: Array(9).fill(null),
 		users: [],
 		winner: null,
-		messages: [{ user: 'server', message: 'Waiting for players' }]
+		messages: [{ userId: 'server', message: 'Waiting for players' }],
 	};
-	const getUserView = (userId: string) => state; // All information is public in TicTacToe
+	const getUserView = () => state; // All information is public in TicTacToe
 	const getUserActions = (userId: string) => {
-		if (userId !== currentPlayer(state)) {
-			return {
-				takeCell: (id: number) => (newState: TicTacToeState) => {
-					if (state.cells[id] !== null) {
-						return;
-					}
-					newState.cells[id] = userId;
-					newState.turnIndex = (state.turnIndex + 1) % 2;
-				}
-			};
+		if (userId !== currentUser(state)) {
+			return {};
 		}
-		return {};
+		return {
+			takeCell:
+				({ cellId }: { cellId: number }) =>
+				(newState: TicTacToeState) => {
+					if (state.cells[cellId] !== null) {
+						return state;
+					}
+					newState.cells[cellId] = userId;
+					newState.turnIndex = (state.turnIndex + 1) % 2;
+				},
+			sendMessage: (message: string) => (newState: TicTacToeState) => {
+				newState.messages.push({ userId, message });
+			},
+		};
 	};
 	const subscribe = (userId: string, listener: () => void) => {
 		listeners.add([userId, listener]);
@@ -70,8 +75,8 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 	const getState = () => state;
 	const setState = (newState: TicTacToeState) => {
 		state = newState;
-		for (const [userId, listener] of listeners) {
-			listener(getUserView(userId));
+		for (const [, listener] of listeners) {
+			listener(getUserView());
 		}
 	};
 	const updateState = (reducer: (state: TicTacToeState) => void) => {
@@ -84,7 +89,7 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 				? `User ${userId} has joined as player ${state.users.length + 1}.`
 				: `User ${userId} has joined as a spectator.`;
 		updateState((newState) => {
-			newState.messages.push({ user: 'server', message });
+			newState.messages.push({ userId: 'server', message });
 			newState.users.push(userId);
 		});
 		return userId;
@@ -93,9 +98,10 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 	return {
 		getState,
 		setState,
+		updateState,
 		subscribe,
 		getUserActions,
 		getUserView,
-		addUser
+		addUser,
 	};
 };

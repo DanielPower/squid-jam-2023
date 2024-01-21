@@ -8,5 +8,6 @@ export const createLobby = () => {
 	const lobbyId = nanoid();
 	const game = createGame();
 	lobbies.set(lobbyId, game);
+	console.log(`Lobby created: ${lobbyId}`);
 	return lobbyId;
 };
