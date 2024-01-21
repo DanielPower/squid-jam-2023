@@ -1,7 +1,8 @@
 export type Game<T, J> = {
 	getState: () => T;
 	setState: (state: T) => void;
-	subscribe: (playerId: number, listener: () => void) => void;
-	getPlayerActions: (playerId: number) => any;
-	getPlayerView: (playerId: number) => J;
+	subscribe: (userId: string, listener: () => void) => void;
+	getUserActions: (userId: string) => any;
+	getUserView: (userId: string) => J;
+	addUser: () => string;
 };
