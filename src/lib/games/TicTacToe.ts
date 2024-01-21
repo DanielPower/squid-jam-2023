@@ -16,6 +16,7 @@ const LINES = [
 export type TicTacToeState = {
 	cells: Array<string | null>;
 	winner: string | null;
+	gameover: boolean;
 	users: Array<string>;
 	turnIndex: number;
 	messages: Array<{
@@ -26,17 +27,25 @@ export type TicTacToeState = {
 
 export type TicTacToePlayerView = TicTacToeState;
 
+// Queries
 const currentUser = (state: TicTacToeState) => state.users[state.turnIndex];
 
-const checkWin = (state: TicTacToeState) => {
+// Action utilities
+const checkWin = (draft: TicTacToeState) => {
 	for (const line of LINES) {
-		if (line.every((cell) => state.cells[cell] === currentUser(state))) {
-			return { winner: currentUser(state) };
+		if (line.every((cell) => draft.cells[cell] === currentUser(draft))) {
+			draft.gameover = true;
+			draft.winner = currentUser(draft);
+			return { winner: currentUser(draft) };
 		}
 	}
-	if (state.cells.every((cell) => cell !== null)) {
-		return { draw: true };
+	if (draft.cells.every((cell) => cell !== null)) {
+		draft.gameover = true;
 	}
+};
+
+const passTurn = (draft: TicTacToeState) => {
+	draft.turnIndex = (draft.turnIndex + 1) % 2;
 };
 
 export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
@@ -47,25 +56,27 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 		cells: Array(9).fill(null),
 		users: [],
 		winner: null,
+		gameover: false,
 		messages: [{ userId: 'server', message: 'Waiting for players' }],
 	};
 	const getUserView = () => state; // All information is public in TicTacToe
 	const getUserActions = (userId: string) => {
-		if (userId !== currentUser(state)) {
+		if (userId !== currentUser(state) || state.gameover) {
 			return {};
 		}
 		return {
 			takeCell:
 				({ cellId }: { cellId: number }) =>
-				(newState: TicTacToeState) => {
+				(draft: TicTacToeState) => {
 					if (state.cells[cellId] !== null) {
 						return state;
 					}
-					newState.cells[cellId] = userId;
-					newState.turnIndex = (state.turnIndex + 1) % 2;
+					draft.cells[cellId] = userId;
+					checkWin(draft);
+					passTurn(draft);
 				},
-			sendMessage: (message: string) => (newState: TicTacToeState) => {
-				newState.messages.push({ userId, message });
+			sendMessage: (message: string) => (draft: TicTacToeState) => {
+				draft.messages.push({ userId, message });
 			},
 		};
 	};
@@ -80,7 +91,7 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 		}
 	};
 	const updateState = (reducer: (state: TicTacToeState) => void) => {
-		setState(create(state, reducer));
+		setState(create(state, reducer, { strict: true }));
 	};
 	const addUser = () => {
 		const userId = nanoid();
@@ -88,9 +99,9 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 			state.users.length < 2
 				? `User ${userId} has joined as player ${state.users.length + 1}.`
 				: `User ${userId} has joined as a spectator.`;
-		updateState((newState) => {
-			newState.messages.push({ userId: 'server', message });
-			newState.users.push(userId);
+		updateState((draft) => {
+			draft.messages.push({ userId: 'server', message });
+			draft.users.push(userId);
 		});
 		return userId;
 	};

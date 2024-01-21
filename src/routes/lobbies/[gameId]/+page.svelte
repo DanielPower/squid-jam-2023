@@ -34,12 +34,12 @@
 		{/each}
 	</div>
 
-	{#if $gameState.winner}
+	{#if $gameState.gameover}
 		<div class="bg-white p-4 rounded-lg shadow-lg">
-			{#if $gameState.winner === '0'}
-				⭕️ You won!
-			{:else if $gameState.winner === '1'}
-				❌ You lost!
+			{#if $gameState.winner === data.userId}
+				🎉 You won!
+			{:else if $gameState.winner}
+				😢 You lost!
 			{:else}
 				🤝 It's a tie!
 			{/if}
