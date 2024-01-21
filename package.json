@@ -36,6 +36,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"mutative": "^1.0.2",
 		"nanoid": "^5.0.4",
 		"svelte-kit-cookie-session": "^4.0.0"
 	}

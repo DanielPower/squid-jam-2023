@@ -1,5 +1,6 @@
 import type { Game } from '$lib/game';
 import { nanoid } from 'nanoid';
+import { create } from 'mutative';
 
 const LINES = [
 	[0, 1, 2],
@@ -52,12 +53,12 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 	const getUserActions = (userId: string) => {
 		if (userId !== currentPlayer(state)) {
 			return {
-				takeCell: (id: number) => {
+				takeCell: (id: number) => (newState: TicTacToeState) => {
 					if (state.cells[id] !== null) {
 						return;
 					}
-					state.cells[id] = userId;
-					state.turnIndex = (state.turnIndex + 1) % 2;
+					newState.cells[id] = userId;
+					newState.turnIndex = (state.turnIndex + 1) % 2;
 				}
 			};
 		}
@@ -73,14 +74,19 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 			listener(getUserView(userId));
 		}
 	};
+	const updateState = (reducer: (state: TicTacToeState) => void) => {
+		setState(create(state, reducer));
+	};
 	const addUser = () => {
 		const userId = nanoid();
 		const message =
 			state.users.length < 2
 				? `User ${userId} has joined as player ${state.users.length + 1}.`
 				: `User ${userId} has joined as a spectator.`;
-		state.messages.push({ user: 'server', message });
-		state.users.push(userId);
+		updateState((newState) => {
+			newState.messages.push({ user: 'server', message });
+			newState.users.push(userId);
+		});
 		return userId;
 	};
 
