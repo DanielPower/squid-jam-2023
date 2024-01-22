@@ -8,6 +8,20 @@
 	export let data: PageData;
 	const gameState = writable(data.initialPlayerView);
 
+	const join = () => {
+		fetch(`${window.location.href}/action`, {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				action: 'becomePlayer',
+			}),
+		});
+	};
+
+	$: alreadyJoined = $gameState.players.includes(data.userId);
+
 	onMount(() => {
 		const shortPoll = async () => {
 			// WebSockets and SvelteKit go together like cats and water.
@@ -34,6 +48,14 @@
 		{/each}
 	</div>
 
+	{#if $gameState.players.length < 2 && !alreadyJoined}
+		<button
+			class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xl"
+			on:click={() => join()}
+		>
+			Join
+		</button>
+	{/if}
 	{#if $gameState.gameover}
 		<div class="bg-white p-4 rounded-lg shadow-lg">
 			{#if $gameState.winner === data.userId}
