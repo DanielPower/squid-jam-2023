@@ -18,8 +18,6 @@
 	export let id: number;
 	export let gameState: Writable<TicTacToePlayerView>;
 	$: playerId = $gameState.cells[id];
-	$: o = $gameState.users[0];
-	$: x = $gameState.users[1];
 </script>
 
 <button
@@ -27,9 +25,9 @@
 	class="w-12 h-12 border border-black"
 	on:click={() => move(id)}
 >
-	{#if playerId === o}
+	{#if playerId === $gameState.players[0]}
 		⭕️
-	{:else if playerId === x}
+	{:else if playerId === $gameState.players[1]}
 		❌
 	{/if}
 </button>
