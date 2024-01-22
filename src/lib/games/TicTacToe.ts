@@ -52,8 +52,8 @@ const passTurn = (draft: TicTacToeState) => {
 };
 
 export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
-	type Listener = (view: TicTacToePlayerView) => void;
-	const listeners = new Set<[string, Listener]>();
+	type Listener = readonly [string, (view: TicTacToePlayerView) => void];
+	const listeners = new Set<Listener>();
 	let state: TicTacToeState = {
 		turnIndex: 0,
 		cells: Array(9).fill(null),
@@ -93,8 +93,12 @@ export const createGame = (): Game<TicTacToeState, TicTacToePlayerView> => {
 			},
 		};
 	};
-	const subscribe = (userId: string, listener: () => void) => {
-		listeners.add([userId, listener]);
+	const subscribe = (userId: string, callback: (state: TicTacToeState) => void) => {
+		const listener = [userId, callback] as const;
+		listeners.add(listener);
+		return () => {
+			listeners.delete(listener);
+		};
 	};
 	const getState = () => state;
 	const setState = (newState: TicTacToeState) => {

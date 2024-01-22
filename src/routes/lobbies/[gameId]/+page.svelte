@@ -4,6 +4,7 @@
 	import Cell from './Cell.svelte';
 	import Chat from './Chat.svelte';
 	import { onMount } from 'svelte';
+	import { subscribe } from '$lib/eventStream';
 
 	export let data: PageData;
 	const gameState = writable(data.initialPlayerView);
@@ -22,20 +23,18 @@
 
 	$: alreadyJoined = $gameState.players.includes(data.userId);
 
+	let result: string[] = [];
+
 	onMount(() => {
-		const shortPoll = async () => {
-			// WebSockets and SvelteKit go together like cats and water.
-			// https://github.com/sveltejs/kit/issues/1491
-			// The proposed workarounds don't handle upgrade requests and cookies
-			// Can revisit when websockets are natively supported
-			const response = await fetch(`${window.location.href}/state`);
-			const newGameState = await response.json();
-			gameState.set(newGameState);
-			setTimeout(shortPoll, 100);
-		};
-		shortPoll();
+		subscribe((message) => {
+			gameState.set(JSON.parse(message));
+		});
 	});
 </script>
+
+{#each result as str}
+	<p>{str}</p>
+{/each}
 
 <div class="absolute inset-0 flex flex-col items-center justify-center">
 	<div>
