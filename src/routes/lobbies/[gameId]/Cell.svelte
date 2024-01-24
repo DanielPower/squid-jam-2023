@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TicTacToePlayerView } from '$lib/games/TicTacToe';
+	import type { TicTacToeState } from '$lib/games/TicTacToe';
 	import type { Writable } from 'svelte/store';
 
 	const move = (cellId: number) => {
@@ -16,7 +16,7 @@
 	};
 
 	export let id: number;
-	export let gameState: Writable<TicTacToePlayerView>;
+	export let gameState: Writable<TicTacToeState>;
 	$: playerId = $gameState.cells[id];
 </script>
 

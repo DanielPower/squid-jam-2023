@@ -1,13 +1,14 @@
 import { nanoid } from 'nanoid';
-import { createGame, type TicTacToePlayerView, type TicTacToeState } from './games/TicTacToe';
-import type { Game } from './game';
+import { ticTacToe } from './games/TicTacToe';
+import type { ValueOf } from '../utility_types';
 
-export const lobbies = new Map<string, Game<TicTacToeState, TicTacToePlayerView>>();
+export const games = { ticTacToe };
+export const lobbies = new Map<string, ReturnType<ValueOf<typeof games>>>();
 
-export const createLobby = () => {
+export const createLobby = (game: keyof typeof games) => {
 	const lobbyId = nanoid();
-	const game = createGame();
-	lobbies.set(lobbyId, game);
+	const lobby = games[game]();
+	lobbies.set(lobbyId, lobby);
 	console.log(`Lobby created: ${lobbyId}`);
 	return lobbyId;
 };

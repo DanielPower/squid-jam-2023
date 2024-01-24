@@ -3,7 +3,7 @@ import { redirect } from '@sveltejs/kit';
 
 export const actions = {
 	new: async () => {
-		const lobbyId = createLobby();
+		const lobbyId = createLobby('ticTacToe');
 		redirect(302, `/lobbies/${lobbyId}`);
-	}
+	},
 };

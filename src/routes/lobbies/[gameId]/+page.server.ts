@@ -1,6 +1,7 @@
 import type { PageServerLoad } from './$types';
 import { lobbies } from '$lib/lobby_manager';
 import { redirect } from '@sveltejs/kit';
+import { nanoid } from 'nanoid';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
 	const lobby = lobbies.get(params.gameId);
@@ -9,17 +10,18 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	}
 	let userId = locals.session.data?.userIds?.[params.gameId];
 	if (!userId) {
-		userId = lobby.addUser();
+		userId = nanoid();
+		lobby.addUser(userId);
 		await locals.session.update(({ userIds }) => ({
 			userIds: {
 				...userIds,
-				[params.gameId]: userId
-			}
+				[params.gameId]: userId,
+			},
 		}));
 	}
 	return {
 		userId,
 		gameId: params.gameId,
-		initialPlayerView: lobby.getUserView(userId)
+		initialPlayerView: lobby.getUserView(userId),
 	};
 };

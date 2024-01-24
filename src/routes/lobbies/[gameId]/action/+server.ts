@@ -13,10 +13,10 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 	}
 	const { action, ...args } = await request.json();
 	const actions = game.getUserActions(userId);
-	if (!actions[action]) {
+	if (!(action in actions)) {
 		return json('Action not available', { status: 400 });
 	}
-	const updater = actions[action](args);
+	const updater = actions[action as keyof typeof actions]!(args);
 	game.updateState(updater);
 	return json('Success');
 };
