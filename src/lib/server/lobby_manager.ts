@@ -1,6 +1,6 @@
 import { nanoid } from 'nanoid';
 import { ticTacToe } from './games/TicTacToe';
-import type { ValueOf } from '../utility_types';
+import type { ValueOf } from '../../utility_types';
 
 export const games = { ticTacToe };
 export const lobbies = new Map<string, ReturnType<ValueOf<typeof games>>>();

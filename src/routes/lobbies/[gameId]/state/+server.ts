@@ -1,6 +1,6 @@
 import { error, json } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import { lobbies } from '$lib/lobby_manager';
+import { lobbies } from '$lib/server/lobby_manager';
 
 export const GET: RequestHandler = ({ params, locals }) => {
 	const userId = locals.session.data.userIds[params.gameId];

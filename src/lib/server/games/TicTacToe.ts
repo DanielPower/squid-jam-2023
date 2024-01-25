@@ -1,4 +1,4 @@
-import { createGame } from '$lib/game';
+import { createGame } from '$lib/server/game';
 
 const LINES = [
 	[0, 1, 2],
@@ -47,11 +47,16 @@ const getUserActions = (userId: string, state: TicTacToeState) => {
 					if (state.cells[cellId] !== null) {
 						return;
 					}
+					if (draft.cells.every((cell) => cell !== null)) {
+						draft.gameover = true;
+						return;
+					}
 					draft.cells[cellId] = userId;
 					for (const line of LINES) {
 						if (line.every((cell) => draft.cells[cell] === currentPlayer)) {
 							draft.gameover = true;
 							draft.winner = currentPlayer;
+							return;
 						}
 					}
 					draft.turnIndex = (draft.turnIndex + 1) % 2;
@@ -67,13 +72,15 @@ const getUserActions = (userId: string, state: TicTacToeState) => {
 					draft.players.push(userId);
 				},
 			}),
-		sendMessage: (message: string) => (draft: TicTacToeState) => {
-			draft.messages.push({ userId, message });
-		},
+		sendMessage:
+			({ message }: { message: string }) =>
+			(draft: TicTacToeState) => {
+				draft.messages.push({ userId, message });
+			},
 	};
 };
 const onUserJoin = (userId: string) => (draft: TicTacToeState) => {
-	draft.messages.push({ userId: 'server', message: `User ${userId} has joined.` });
+	draft.messages.push({ userId: 'server', message: `${userId} has joined.` });
 	draft.users.push(userId);
 };
 

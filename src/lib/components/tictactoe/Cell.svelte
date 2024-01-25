@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TicTacToeState } from '$lib/games/TicTacToe';
+	import type { TicTacToeState } from '$lib/server/games/TicTacToe';
 	import type { Writable } from 'svelte/store';
 
 	const move = (cellId: number) => {

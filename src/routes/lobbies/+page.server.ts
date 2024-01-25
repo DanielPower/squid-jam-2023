@@ -1,4 +1,4 @@
-import { createLobby } from '$lib/lobby_manager';
+import { createLobby } from '$lib/server/lobby_manager';
 import { redirect } from '@sveltejs/kit';
 
 export const actions = {

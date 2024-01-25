@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import type { PageData } from './$types';
-	import Cell from './Cell.svelte';
-	import Chat from './Chat.svelte';
+	import Chat from '$lib/components/Chat.svelte';
 	import { onMount } from 'svelte';
-	import { subscribe } from '$lib/eventStream';
+	import { subscribe } from '$lib/util/eventStream';
+	import Board from '$lib/components/tictactoe/Board.svelte';
 
 	export let data: PageData;
 	const gameState = writable(data.initialPlayerView);
@@ -36,35 +36,30 @@
 	<p>{str}</p>
 {/each}
 
-<div class="absolute inset-0 flex flex-col items-center justify-center">
-	<div>
-		{#each { length: 3 } as _, i}
-			<div class="flex">
-				{#each { length: 3 } as _, j}
-					<Cell {gameState} id={i * 3 + j} />
-				{/each}
-			</div>
-		{/each}
-	</div>
-
-	{#if $gameState.players.length < 2 && !alreadyJoined}
-		<button
-			class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xl"
-			on:click={() => join()}
-		>
-			Join
-		</button>
-	{/if}
-	{#if $gameState.gameover}
-		<div class="bg-white p-4 rounded-lg shadow-lg">
-			{#if $gameState.winner === data.userId}
-				🎉 You won!
-			{:else if $gameState.winner}
-				😢 You lost!
-			{:else}
-				🤝 It's a tie!
+<div class="flex w-full h-svh p-4">
+	<div class="flex flex-grow items-center justify-center">
+		<div>
+			<Board {gameState} />
+			{#if $gameState.players.length < 2 && !alreadyJoined}
+				<button
+					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xl"
+					on:click={() => join()}
+				>
+					Join
+				</button>
+			{/if}
+			{#if $gameState.gameover}
+				<div class="bg-white p-4 rounded-lg shadow-lg">
+					{#if $gameState.winner === data.userId}
+						🎉 You won!
+					{:else if $gameState.winner}
+						😢 You lost!
+					{:else}
+						🤝 It's a tie!
+					{/if}
+				</div>
 			{/if}
 		</div>
-	{/if}
+	</div>
 	<Chat {gameState} />
 </div>
