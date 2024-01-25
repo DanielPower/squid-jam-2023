@@ -12,7 +12,6 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 		return error(404);
 	}
 	const { action, ...args } = await request.json();
-	console.log(args);
 	const actions = game.getUserActions(userId);
 	if (!(action in actions)) {
 		return json('Action not available', { status: 400 });

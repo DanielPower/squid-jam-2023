@@ -6,6 +6,8 @@
 
 	let message = '';
 	const sendMessage = () => {
+		const trimmedMessage = message.trim();
+		if (!trimmedMessage) return;
 		fetch(`${window.location.href}/action`, {
 			method: 'POST',
 			headers: {
@@ -18,12 +20,15 @@
 		});
 		message = '';
 	};
+	$: reversedMessages = $gameState.messages.toReversed();
 </script>
 
-<div class="flex flex-col justify-end">
-	{#each $gameState.messages as { userId, message }}
-		<p>{userId}: {message}</p>
-	{/each}
+<div class="flex flex-col justify-end max-w-96">
+	<div class="flex flex-col-reverse flex-grow overflow-y-auto">
+		{#each reversedMessages as { userId, message }}
+			<p>{userId}: {message}</p>
+		{/each}
+	</div>
 	<div class="flex">
 		<input
 			type="text"
