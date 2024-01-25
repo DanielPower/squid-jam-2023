@@ -5,29 +5,18 @@
 	import { onMount } from 'svelte';
 	import { subscribe } from '$lib/util/eventStream';
 	import Board from '$lib/components/tictactoe/Board.svelte';
+	import Join from '$lib/components/tictactoe/Join.svelte';
+	import Result from '$lib/components/tictactoe/Result.svelte';
 
 	export let data: PageData;
+	const { userId } = data;
 	const gameState = writable(data.initialPlayerView);
-
-	const join = () => {
-		fetch(`${window.location.href}/action`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				action: 'becomePlayer',
-			}),
-		});
-	};
-
-	$: alreadyJoined = $gameState.players.includes(data.userId);
 
 	let result: string[] = [];
 
 	onMount(() => {
 		subscribe((message) => {
-			gameState.set(JSON.parse(message));
+			gameState.set(message);
 		});
 	});
 </script>
@@ -38,27 +27,10 @@
 
 <div class="flex w-full h-svh p-4">
 	<div class="flex flex-grow items-center justify-center">
-		<div>
+		<div class="flex flex-col gap-4">
+			<Result {gameState} {userId} />
 			<Board {gameState} />
-			{#if $gameState.players.length < 2 && !alreadyJoined}
-				<button
-					class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded text-xl"
-					on:click={() => join()}
-				>
-					Join
-				</button>
-			{/if}
-			{#if $gameState.gameover}
-				<div class="bg-white p-4 rounded-lg shadow-lg">
-					{#if $gameState.winner === data.userId}
-						🎉 You won!
-					{:else if $gameState.winner}
-						😢 You lost!
-					{:else}
-						🤝 It's a tie!
-					{/if}
-				</div>
-			{/if}
+			<Join {gameState} {userId} />
 		</div>
 	</div>
 	<Chat {gameState} />
