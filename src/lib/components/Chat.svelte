@@ -1,5 +1,6 @@
 <script lang="ts">
-	import type { TicTacToeState } from '$lib/server/games/TicTacToe';
+	import type { TicTacToeActions, TicTacToeState } from '$lib/server/games/TicTacToe';
+	import { action } from '$lib/util/action';
 	import type { Writable } from 'svelte/store';
 
 	export let gameState: Writable<TicTacToeState>;
@@ -8,22 +9,13 @@
 	const sendMessage = () => {
 		const trimmedMessage = message.trim();
 		if (!trimmedMessage) return;
-		fetch(`${window.location.href}/action`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				action: 'sendMessage',
-				message,
-			}),
-		});
+		action<TicTacToeActions, 'sendMessage'>('sendMessage', { message: trimmedMessage });
 		message = '';
 	};
 	$: reversedMessages = $gameState.messages.toReversed();
 </script>
 
-<div class="flex flex-col justify-end max-w-96">
+<div class="flex flex-col justify-end max-w-96 h-full">
 	<div class="flex flex-col-reverse flex-grow overflow-y-auto">
 		{#each reversedMessages as { userId, message }}
 			<p>{userId}: {message}</p>

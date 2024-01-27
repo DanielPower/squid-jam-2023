@@ -25,13 +25,15 @@
 	<p>{str}</p>
 {/each}
 
-<div class="flex w-full h-svh p-4">
-	<div class="flex flex-grow items-center justify-center">
+<div class="flex flex-col w-full h-svh p-4">
+	<div class="flex items-center justify-center">
 		<div class="flex flex-col gap-4">
 			<Result {gameState} {userId} />
 			<Board {gameState} />
 			<Join {gameState} {userId} />
 		</div>
 	</div>
-	<Chat {gameState} />
+	<div class="flex-grow">
+		<Chat {gameState} />
+	</div>
 </div>

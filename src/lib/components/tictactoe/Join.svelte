@@ -1,20 +1,11 @@
 <script lang="ts">
-	import type { TicTacToeState } from '$lib/server/games/TicTacToe';
+	import type { TicTacToeActions, TicTacToeState } from '$lib/server/games/TicTacToe';
+	import { action } from '$lib/util/action';
 	import type { Writable } from 'svelte/store';
 
 	export let gameState: Writable<TicTacToeState>;
 	export let userId: string;
-	const join = () => {
-		fetch(`${window.location.href}/action`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				action: 'becomePlayer',
-			}),
-		});
-	};
+	const join = () => action<TicTacToeActions, 'becomePlayer'>('becomePlayer');
 	$: alreadyJoined = $gameState.players.includes(userId);
 </script>
 

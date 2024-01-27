@@ -1,4 +1,5 @@
 import { createGame } from '$lib/server/game';
+import type { Draft } from 'mutative';
 
 const LINES = [
 	[0, 1, 2],
@@ -26,6 +27,12 @@ export type TicTacToeState = {
 	}>;
 };
 
+export type TicTacToeActions = {
+	takeCell: (args: { cellId: number }) => (state: Draft<TicTacToeState>) => void;
+	becomePlayer: () => (state: Draft<TicTacToeState>) => void;
+	sendMessage: (args: { message: string }) => (state: Draft<TicTacToeState>) => void;
+};
+
 const initialState: TicTacToeState = {
 	turnIndex: 0,
 	cells: Array(9).fill(null),
@@ -37,41 +44,36 @@ const initialState: TicTacToeState = {
 };
 
 const getUserView = (userId: string, state: TicTacToeState) => state; // All information is public in TicTacToe
-const getUserActions = (userId: string, state: TicTacToeState) => {
+const getUserActions = (userId: string, state: TicTacToeState): TicTacToeActions => {
 	const currentPlayer = state.players[state.turnIndex];
 	return {
-		...(userId === currentPlayer && {
-			takeCell:
-				({ cellId }: { cellId: number }) =>
-				(draft: TicTacToeState) => {
-					if (state.cells[cellId] !== null) {
-						return;
-					}
-					if (draft.cells.every((cell) => cell !== null)) {
+		takeCell:
+			({ cellId }: { cellId: number }) =>
+			(draft: TicTacToeState) => {
+				if (draft.gameover || currentPlayer !== userId || state.cells[cellId] !== null) {
+					return;
+				}
+				if (draft.cells.every((cell) => cell !== null)) {
+					draft.gameover = true;
+					return;
+				}
+				draft.cells[cellId] = userId;
+				for (const line of LINES) {
+					if (line.every((cell) => draft.cells[cell] === currentPlayer)) {
 						draft.gameover = true;
+						draft.winner = currentPlayer;
 						return;
 					}
-					draft.cells[cellId] = userId;
-					for (const line of LINES) {
-						if (line.every((cell) => draft.cells[cell] === currentPlayer)) {
-							draft.gameover = true;
-							draft.winner = currentPlayer;
-							return;
-						}
-					}
-					draft.turnIndex = (draft.turnIndex + 1) % 2;
-				},
-		}),
-		...(state.players.length < 2 &&
-			!state.players.includes(userId) && {
-				becomePlayer: () => (draft: TicTacToeState) => {
-					draft.messages.push({
-						userId: 'server',
-						message: `${userId} is now playing as ${PLAYER_SYMBOL[draft.players.length]}`,
-					});
-					draft.players.push(userId);
-				},
-			}),
+				}
+				draft.turnIndex = (draft.turnIndex + 1) % 2;
+			},
+		becomePlayer: () => (draft: TicTacToeState) => {
+			draft.messages.push({
+				userId: 'server',
+				message: `${userId} is now playing as ${PLAYER_SYMBOL[draft.players.length]}`,
+			});
+			draft.players.push(userId);
+		},
 		sendMessage:
 			({ message }: { message: string }) =>
 			(draft: TicTacToeState) => {

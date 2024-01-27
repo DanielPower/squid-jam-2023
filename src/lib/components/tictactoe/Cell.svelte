@@ -1,19 +1,9 @@
 <script lang="ts">
-	import type { TicTacToeState } from '$lib/server/games/TicTacToe';
+	import type { TicTacToeActions, TicTacToeState } from '$lib/server/games/TicTacToe';
+	import { action } from '$lib/util/action';
 	import type { Writable } from 'svelte/store';
 
-	const move = (cellId: number) => {
-		fetch(`${window.location.href}/action`, {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				action: 'takeCell',
-				cellId,
-			}),
-		});
-	};
+	const move = (cellId: number) => action<TicTacToeActions, 'takeCell'>('takeCell', { cellId });
 
 	export let id: number;
 	export let gameState: Writable<TicTacToeState>;
