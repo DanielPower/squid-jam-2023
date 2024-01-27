@@ -1,5 +1,4 @@
 import { createGame } from '$lib/server/game';
-import type { Draft } from 'mutative';
 
 const LINES = [
 	[0, 1, 2],
@@ -14,7 +13,7 @@ const LINES = [
 
 const PLAYER_SYMBOL = ['O', 'X'];
 
-export type TicTacToeState = {
+export type SquidChessState = {
 	cells: Array<string | null>;
 	winner: string | null;
 	gameover: boolean;
@@ -27,13 +26,7 @@ export type TicTacToeState = {
 	}>;
 };
 
-export type TicTacToeActions = {
-	takeCell: (args: { cellId: number }) => (state: Draft<TicTacToeState>) => void;
-	becomePlayer: () => (state: Draft<TicTacToeState>) => void;
-	sendMessage: (args: { message: string }) => (state: Draft<TicTacToeState>) => void;
-};
-
-const initialState: TicTacToeState = {
+const initialState: SquidChessState = {
 	turnIndex: 0,
 	cells: Array(9).fill(null),
 	users: [],
@@ -43,13 +36,19 @@ const initialState: TicTacToeState = {
 	messages: [{ userId: 'server', message: 'Waiting for players' }],
 };
 
-const getUserView = (userId: string, state: TicTacToeState) => state; // All information is public in TicTacToe
-const getUserActions = (userId: string, state: TicTacToeState): TicTacToeActions => {
+const getUserView = (userId: string, state: SquidChessState) => ({
+	userId,
+	...state,
+});
+
+export type SquidChessUserView = ReturnType<typeof getUserView>;
+
+const getUserActions = (userId: string, state: SquidChessState) => {
 	const currentPlayer = state.players[state.turnIndex];
 	return {
 		takeCell:
 			({ cellId }: { cellId: number }) =>
-			(draft: TicTacToeState) => {
+			(draft: SquidChessState) => {
 				if (draft.gameover || currentPlayer !== userId || state.cells[cellId] !== null) {
 					return;
 				}
@@ -67,7 +66,7 @@ const getUserActions = (userId: string, state: TicTacToeState): TicTacToeActions
 				}
 				draft.turnIndex = (draft.turnIndex + 1) % 2;
 			},
-		becomePlayer: () => (draft: TicTacToeState) => {
+		becomePlayer: () => (draft: SquidChessState) => {
 			draft.messages.push({
 				userId: 'server',
 				message: `${userId} is now playing as ${PLAYER_SYMBOL[draft.players.length]}`,
@@ -76,14 +75,17 @@ const getUserActions = (userId: string, state: TicTacToeState): TicTacToeActions
 		},
 		sendMessage:
 			({ message }: { message: string }) =>
-			(draft: TicTacToeState) => {
+			(draft: SquidChessState) => {
 				draft.messages.push({ userId, message });
 			},
 	};
 };
-const onUserJoin = (userId: string) => (draft: TicTacToeState) => {
+
+export type SquidChessActions = ReturnType<typeof getUserActions>;
+
+const onUserJoin = (userId: string) => (draft: SquidChessState) => {
 	draft.messages.push({ userId: 'server', message: `${userId} has joined.` });
 	draft.users.push(userId);
 };
 
-export const ticTacToe = () => createGame(initialState, getUserView, getUserActions, onUserJoin);
+export const squidChess = () => createGame(initialState, getUserView, getUserActions, onUserJoin);

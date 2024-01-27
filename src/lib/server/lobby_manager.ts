@@ -1,14 +1,18 @@
 import { nanoid } from 'nanoid';
-import { ticTacToe } from './games/TicTacToe';
-import type { ValueOf } from '../../utility_types';
+import { tictactoe } from './games/tictactoe';
+import { squidChess } from './games/squid_chess';
 
-export const games = { ticTacToe };
-export const lobbies = new Map<string, ReturnType<ValueOf<typeof games>>>();
+export const games = { tictactoe, squidChess };
+export const lobbies = new Map<string, { gameMode: string; game: any }>();
 
-export const createLobby = (game: keyof typeof games) => {
+export const createLobby = (gameMode: string) => {
 	const lobbyId = nanoid();
-	const lobby = games[game]();
-	lobbies.set(lobbyId, lobby);
+	console.log(gameMode);
+	if (!(gameMode in games)) {
+		throw new Error(`Unknown game mode: ${gameMode}`);
+	}
+	const game = games[gameMode as keyof typeof games]();
+	lobbies.set(lobbyId, { gameMode, game });
 	console.log(`Lobby created: ${lobbyId}`);
 	return lobbyId;
 };

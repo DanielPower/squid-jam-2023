@@ -7,16 +7,16 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 	if (!userId) {
 		return error(404);
 	}
-	const game = lobbies.get(params.gameId);
-	if (!game) {
+	const lobby = lobbies.get(params.gameId);
+	if (!lobby) {
 		return error(404);
 	}
 	const { action, args } = await request.json();
-	const actions = game.getUserActions(userId);
+	const actions = lobby.game.getUserActions(userId);
 	if (!(action in actions)) {
 		return json('Action not available', { status: 400 });
 	}
-	const updater = actions[action as keyof typeof actions]!(args);
-	game.updateState(updater);
+	const updater = actions[action]!(args);
+	lobby.game.updateState(updater);
 	return json('Success');
 };

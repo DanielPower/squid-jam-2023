@@ -1,13 +1,12 @@
 <script lang="ts">
-	import type { TicTacToeState } from '$lib/server/games/TicTacToe';
+	import type { TicTacToeUserView } from '$lib/server/games/tictactoe';
 	import type { Writable } from 'svelte/store';
-	export let gameState: Writable<TicTacToeState>;
-	export let userId: string;
+	export let gameState: Writable<TicTacToeUserView>;
 </script>
 
 {#if $gameState.gameover}
 	<div class="bg-white p-4 rounded-lg shadow-lg">
-		{#if $gameState.winner === userId}
+		{#if $gameState.winner === $gameState.userId}
 			🎉 You won!
 		{:else if $gameState.winner}
 			😢 You lost!

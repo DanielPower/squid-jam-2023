@@ -11,7 +11,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 	let userId = locals.session.data?.userIds?.[params.gameId];
 	if (!userId) {
 		userId = randomName();
-		lobby.addUser(userId);
+		lobby.game.addUser(userId);
 		await locals.session.update(({ userIds }) => ({
 			userIds: {
 				...userIds,
@@ -20,8 +20,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
 		}));
 	}
 	return {
-		userId,
-		gameId: params.gameId,
-		initialPlayerView: lobby.getUserView(userId),
+		gameData: {
+			gameId: params.gameId,
+			gameMode: lobby.gameMode,
+		},
+		initialPlayerView: lobby.game.getUserView(userId),
 	};
 };

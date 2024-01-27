@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TicTacToeState } from '$lib/server/games/TicTacToe';
+	import type { TicTacToeState } from '$lib/server/games/tictactoe';
 	import type { Writable } from 'svelte/store';
 	import Cell from './Cell.svelte';
 

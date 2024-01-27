@@ -1,18 +1,14 @@
 <script lang="ts">
 	import { writable } from 'svelte/store';
 	import type { PageData } from './$types';
-	import Chat from '$lib/components/Chat.svelte';
 	import { onMount } from 'svelte';
 	import { subscribe } from '$lib/util/eventStream';
-	import Board from '$lib/components/tictactoe/Board.svelte';
-	import Join from '$lib/components/tictactoe/Join.svelte';
-	import Result from '$lib/components/tictactoe/Result.svelte';
+	import TicTacToe from '$lib/components/tictactoe/TicTacToe.svelte';
+	import SquidChess from '$lib/components/squid_chess/SquidChess.svelte';
 
 	export let data: PageData;
-	const { userId } = data;
-	const gameState = writable(data.initialPlayerView);
-
-	let result: string[] = [];
+	const gameState = writable(data.initialPlayerView) as any;
+	const { gameMode } = data.gameData;
 
 	onMount(() => {
 		subscribe((message) => {
@@ -21,19 +17,10 @@
 	});
 </script>
 
-{#each result as str}
-	<p>{str}</p>
-{/each}
-
-<div class="flex flex-col w-full h-svh p-4">
-	<div class="flex items-center justify-center">
-		<div class="flex flex-col gap-4">
-			<Result {gameState} {userId} />
-			<Board {gameState} />
-			<Join {gameState} {userId} />
-		</div>
-	</div>
-	<div class="flex-grow">
-		<Chat {gameState} />
-	</div>
-</div>
+{#if gameMode === 'tictactoe'}
+	<TicTacToe {gameState} />
+{:else if gameMode === 'squidChess'}
+	<SquidChess {gameState} />
+{:else}
+	<p>Unknown game mode: {gameMode}</p>
+{/if}

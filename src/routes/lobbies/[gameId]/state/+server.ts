@@ -7,9 +7,9 @@ export const GET: RequestHandler = ({ params, locals }) => {
 	if (!userId) {
 		return error(404);
 	}
-	const game = lobbies.get(params.gameId);
-	if (!game) {
+	const lobby = lobbies.get(params.gameId);
+	if (!lobby) {
 		return error(404);
 	}
-	return json(game.getUserView(userId));
+	return json(lobby.game.getUserView(userId));
 };
