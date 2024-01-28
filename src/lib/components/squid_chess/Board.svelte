@@ -23,10 +23,12 @@
 	$: rows = makeRows($gameState.board);
 </script>
 
-{#each rows as row, i}
-	<div class="flex">
-		{#each row as piece, j}
-			<Cell id={i + j}><Piece {piece} /></Cell>
-		{/each}
-	</div>
-{/each}
+<div>
+	{#each rows as row, i}
+		<div class="flex">
+			{#each row as piece, j}
+				<Cell id={i + j}><Piece {piece} /></Cell>
+			{/each}
+		</div>
+	{/each}
+</div>

@@ -40,4 +40,6 @@
 	{:else}
 		♟
 	{/if}
+{:else if piece.type === 'wall'}
+	⬜
 {/if}
