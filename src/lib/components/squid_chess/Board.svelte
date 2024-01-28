@@ -8,7 +8,6 @@
 	export let gameState: Writable<SquidChessUserView>;
 	const { toIndex, toCoord } = makeGridUtils(7);
 
-	console.log('fuck');
 	let rows: TPiece[][] = [];
 	const makeRows = (board: TPiece[]) => {
 		const rows = [];
@@ -22,7 +21,6 @@
 		return rows;
 	};
 	$: rows = makeRows($gameState.board);
-	$: () => console.log(rows);
 </script>
 
 {#each rows as row, i}

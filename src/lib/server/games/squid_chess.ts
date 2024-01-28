@@ -3,8 +3,6 @@ import { makeGridUtils } from '$lib/util/grid';
 
 const { toIndex } = makeGridUtils(7);
 
-const PLAYER_SYMBOL = ['O', 'X'];
-
 export type Pawn = {
 	owner: 'white' | 'black';
 	type: 'pawn';
@@ -50,6 +48,10 @@ export type Empty = {
 
 export type TPiece = Pawn | King | Queen | Rook | Bishop | Knight | Squid | Wall | Empty;
 
+export type Card = {
+	type: 'move' | 'attack' | 'defend' | 'special';
+};
+
 const makeInitialBoard = () => {
 	const board: TPiece[] = Array(49).fill({ type: 'empty' });
 	board[toIndex(3, 0)] = { type: 'king', owner: 'white' };
@@ -64,14 +66,21 @@ const makeInitialBoard = () => {
 };
 
 export type SquidChessState = {
-	white: string | null;
-	black: string | null;
+	players: {
+		black: {
+			hand: Card[];
+			userId: string | null;
+		};
+		white: {
+			hand: Card[];
+			userId: string | null;
+		};
+	};
 	currentPlayer: 'white' | 'black';
 	board: Array<TPiece>;
 	winner: string | null;
 	gameover: boolean;
 	users: Array<string>;
-	players: Array<string>;
 	messages: Array<{
 		userId: string;
 		message: string;
@@ -79,12 +88,19 @@ export type SquidChessState = {
 };
 
 const initialState: SquidChessState = {
-	white: null,
-	black: null,
+	players: {
+		black: {
+			hand: [],
+			userId: null,
+		},
+		white: {
+			hand: [{ type: 'move' }, { type: 'move' }],
+			userId: null,
+		},
+	},
 	currentPlayer: 'white',
 	board: makeInitialBoard(),
 	users: [],
-	players: [],
 	winner: null,
 	gameover: false,
 	messages: [{ userId: 'server', message: 'Waiting for players' }],
@@ -97,15 +113,18 @@ const getUserView = (userId: string, state: SquidChessState) => ({
 
 export type SquidChessUserView = ReturnType<typeof getUserView>;
 
-const getUserActions = (userId: string, state: SquidChessState) => {
+const getUserActions = (userId: string) => {
 	return {
-		becomePlayer: () => (draft: SquidChessState) => {
-			draft.messages.push({
-				userId: 'server',
-				message: `${userId} is now playing as ${PLAYER_SYMBOL[draft.players.length]}`,
-			});
-			draft.players.push(userId);
-		},
+		becomePlayer:
+			({ color }: { color: 'black' | 'white' }) =>
+			(draft: SquidChessState) => {
+				if (draft.players[color].userId !== null) return;
+				draft.messages.push({
+					userId: 'server',
+					message: `${userId} is now playing as ${color}`,
+				});
+				draft.players[color].userId = userId;
+			},
 		sendMessage:
 			({ message }: { message: string }) =>
 			(draft: SquidChessState) => {

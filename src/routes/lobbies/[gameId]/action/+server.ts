@@ -18,5 +18,7 @@ export const POST: RequestHandler = async ({ request, params, locals }) => {
 	}
 	const updater = actions[action]!(args);
 	lobby.game.updateState(updater);
+	console.log(`ACTION[${action}] user[${userId}] args:${JSON.stringify(args)}`);
+	console.log(lobby.game.getState());
 	return json('Success');
 };

@@ -7,7 +7,6 @@ export const actions: Actions = {
 		const data = await request.formData();
 		const gameMode = data.get('gameMode') as string;
 		const lobbyId = createLobby(gameMode);
-		console.log('redirect?', lobbyId);
 		redirect(302, `/lobbies/${lobbyId}`);
 	},
 };
