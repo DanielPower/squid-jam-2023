@@ -1,15 +1,14 @@
 <script lang="ts">
-	import type { TicTacToeActions, TicTacToeState } from '$lib/server/games/tictactoe';
 	import { action } from '$lib/util/action';
 	import type { Writable } from 'svelte/store';
 
-	export let gameState: Writable<TicTacToeState>;
+	export let gameState: Writable<{ messages: Array<{ userId: string; message: string }> }>;
 
 	let message = '';
 	const sendMessage = () => {
 		const trimmedMessage = message.trim();
 		if (!trimmedMessage) return;
-		action<TicTacToeActions, 'sendMessage'>('sendMessage', { message: trimmedMessage });
+		action<any, 'sendMessage'>('sendMessage', { message: trimmedMessage });
 		message = '';
 	};
 	$: reversedMessages = $gameState.messages.toReversed();
@@ -26,8 +25,8 @@
 			type="text"
 			bind:value={message}
 			on:keypress={({ key }) => key === 'Enter' && sendMessage()}
-			class="w-full border border-black"
+			class="p-1 w-full border border-black"
 		/>
-		<button class="w-12 h-12 border border-black" on:click={sendMessage}>Send</button>
+		<button class="p-1 border border-black" on:click={sendMessage}>Send</button>
 	</div>
 </div>
