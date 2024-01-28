@@ -1,25 +1,77 @@
 import { createGame } from '$lib/server/game';
+import { makeGridUtils } from '$lib/util/grid';
 
-const LINES = [
-	[0, 1, 2],
-	[3, 4, 5],
-	[6, 7, 8],
-	[0, 3, 6],
-	[1, 4, 7],
-	[2, 5, 8],
-	[0, 4, 8],
-	[2, 4, 6],
-];
+const { toIndex } = makeGridUtils(7);
 
 const PLAYER_SYMBOL = ['O', 'X'];
 
+export type Pawn = {
+	owner: 'white' | 'black';
+	type: 'pawn';
+};
+
+export type King = {
+	owner: 'white' | 'black';
+	type: 'king';
+};
+
+export type Queen = {
+	owner: 'white' | 'black';
+	type: 'queen';
+};
+
+export type Rook = {
+	owner: 'white' | 'black';
+	type: 'rook';
+};
+
+export type Bishop = {
+	owner: 'white' | 'black';
+	type: 'bishop';
+};
+
+export type Knight = {
+	owner: 'white' | 'black';
+	type: 'knight';
+};
+
+export type Squid = {
+	owner: 'white' | 'black';
+	type: 'squid';
+};
+
+export type Wall = {
+	type: 'wall';
+};
+
+export type Empty = {
+	type: 'empty';
+};
+
+export type TPiece = Pawn | King | Queen | Rook | Bishop | Knight | Squid | Wall | Empty;
+
+const makeInitialBoard = () => {
+	const board: TPiece[] = Array(49).fill({ type: 'empty' });
+	board[toIndex(3, 0)] = { type: 'king', owner: 'white' };
+	board[toIndex(2, 1)] = { type: 'pawn', owner: 'white' };
+	board[toIndex(3, 1)] = { type: 'pawn', owner: 'white' };
+	board[toIndex(4, 1)] = { type: 'pawn', owner: 'white' };
+	board[toIndex(2, 5)] = { type: 'pawn', owner: 'black' };
+	board[toIndex(3, 5)] = { type: 'pawn', owner: 'black' };
+	board[toIndex(4, 5)] = { type: 'pawn', owner: 'black' };
+	board[toIndex(3, 6)] = { type: 'king', owner: 'black' };
+	return board;
+};
+
 export type SquidChessState = {
-	cells: Array<string | null>;
+	white: string | null;
+	black: string | null;
+	currentPlayer: 'white' | 'black';
+	board: Array<TPiece>;
 	winner: string | null;
 	gameover: boolean;
 	users: Array<string>;
 	players: Array<string>;
-	turnIndex: number;
 	messages: Array<{
 		userId: string;
 		message: string;
@@ -27,8 +79,10 @@ export type SquidChessState = {
 };
 
 const initialState: SquidChessState = {
-	turnIndex: 0,
-	cells: Array(9).fill(null),
+	white: null,
+	black: null,
+	currentPlayer: 'white',
+	board: makeInitialBoard(),
 	users: [],
 	players: [],
 	winner: null,
@@ -44,28 +98,7 @@ const getUserView = (userId: string, state: SquidChessState) => ({
 export type SquidChessUserView = ReturnType<typeof getUserView>;
 
 const getUserActions = (userId: string, state: SquidChessState) => {
-	const currentPlayer = state.players[state.turnIndex];
 	return {
-		takeCell:
-			({ cellId }: { cellId: number }) =>
-			(draft: SquidChessState) => {
-				if (draft.gameover || currentPlayer !== userId || state.cells[cellId] !== null) {
-					return;
-				}
-				if (draft.cells.every((cell) => cell !== null)) {
-					draft.gameover = true;
-					return;
-				}
-				draft.cells[cellId] = userId;
-				for (const line of LINES) {
-					if (line.every((cell) => draft.cells[cell] === currentPlayer)) {
-						draft.gameover = true;
-						draft.winner = currentPlayer;
-						return;
-					}
-				}
-				draft.turnIndex = (draft.turnIndex + 1) % 2;
-			},
 		becomePlayer: () => (draft: SquidChessState) => {
 			draft.messages.push({
 				userId: 'server',
