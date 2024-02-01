@@ -1,4 +1,4 @@
-import { createGame } from '$lib/server/game';
+import { createGame } from '$lib/game';
 import { makeGridUtils } from '$lib/util/grid';
 
 const { toIndex } = makeGridUtils(7);
@@ -118,10 +118,14 @@ export type SquidChessState = {
 		black: {
 			hand: Card[];
 			userId: string | null;
+			hoveredCard: number | null;
+			selectedCard: number | null;
 		};
 		white: {
 			hand: Card[];
 			userId: string | null;
+			hoveredCard: number | null;
+			selectedCard: number | null;
 		};
 	};
 	currentPlayer: 'white' | 'black';
@@ -138,20 +142,16 @@ export type SquidChessState = {
 const initialState: SquidChessState = {
 	players: {
 		black: {
-			hand: [
-				{ title: 'Fuck', type: 'spell', spell: 'swap' },
-				{ title: 'Balls', type: 'spell', spell: 'swap' },
-				{ title: 'Tar', type: 'spell', spell: 'swap' },
-				{ title: 'Dimension Fart', type: 'spell', spell: 'swap' },
-			],
+			hand: [cards.pawn],
 			userId: null,
+			hoveredCard: null,
+			selectedCard: null,
 		},
 		white: {
-			hand: [
-				{ title: 'Blast', type: 'spell', spell: 'swap' },
-				{ title: 'Ach', type: 'spell', spell: 'swap' },
-			],
+			hand: [cards.pawn, cards.pawn, cards.pawn],
 			userId: null,
+			hoveredCard: null,
+			selectedCard: null,
 		},
 	},
 	currentPlayer: 'white',
@@ -197,6 +197,13 @@ const getUserActions = (userId: string) => {
 				});
 				draft.players[color].userId = userId;
 			},
+		hoverCard:
+			({ cardId }: { cardId: number }) =>
+			(draft: SquidChessState) => {
+				const color = qUserColor(userId)(draft);
+				if (!color) return;
+				draft.players[color].hoveredCard = cardId;
+			},
 		sendMessage:
 			({ message }: { message: string }) =>
 			(draft: SquidChessState) => {
@@ -204,6 +211,15 @@ const getUserActions = (userId: string) => {
 			},
 	};
 };
+
+// Queries
+export const qUserColor = (userId: string) => (state: SquidChessState) => {
+	if (state.players.white.userId === userId) return 'white';
+	if (state.players.black.userId === userId) return 'black';
+	return null;
+};
+
+export const myColor = (state: SquidChessUserView) => qUserColor(state.userId)(state);
 
 export type SquidChessActions = ReturnType<typeof getUserActions>;
 

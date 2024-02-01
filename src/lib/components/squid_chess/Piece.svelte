@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TPiece } from '$lib/server/games/squid_chess';
+	import type { TPiece } from '$lib/games/squid_chess';
 
 	export let piece: TPiece;
 </script>

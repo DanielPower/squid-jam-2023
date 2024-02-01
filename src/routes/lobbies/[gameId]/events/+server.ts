@@ -1,7 +1,7 @@
 import { lobbies } from '$lib/server/lobby_manager';
 import { error } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
-import type { TicTacToeUserView } from '$lib/server/games/tictactoe';
+import type { TicTacToeUserView } from '$lib/games/tictactoe';
 
 // BAD This is awful and probably causes resource leaks because I'm not timing out connections.
 export const GET: RequestHandler = ({ params, locals }) => {

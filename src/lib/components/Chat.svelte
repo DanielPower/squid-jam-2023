@@ -8,7 +8,7 @@
 	const sendMessage = () => {
 		const trimmedMessage = message.trim();
 		if (!trimmedMessage) return;
-		action<any, 'sendMessage'>('sendMessage', { message: trimmedMessage });
+		action('sendMessage', { message: trimmedMessage });
 		message = '';
 	};
 	$: reversedMessages = $gameState.messages.toReversed();

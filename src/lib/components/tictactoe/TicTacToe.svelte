@@ -3,7 +3,7 @@
 	import Board from '$lib/components/tictactoe/Board.svelte';
 	import Join from '$lib/components/tictactoe/Join.svelte';
 	import Result from '$lib/components/tictactoe/Result.svelte';
-	import type { TicTacToeUserView } from '$lib/server/games/tictactoe';
+	import type { TicTacToeUserView } from '$lib/games/tictactoe';
 	import type { Writable } from 'svelte/store';
 
 	export let gameState: Writable<TicTacToeUserView>;

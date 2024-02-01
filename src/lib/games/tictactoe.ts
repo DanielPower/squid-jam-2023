@@ -1,4 +1,4 @@
-import { createGame } from '$lib/server/game';
+import { createGame } from '$lib/game';
 
 const LINES = [
 	[0, 1, 2],

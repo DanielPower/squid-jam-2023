@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TPiece, SquidChessUserView } from '$lib/server/games/squid_chess';
+	import type { TPiece, SquidChessUserView } from '$lib/games/squid_chess';
 	import { makeGridUtils } from '$lib/util/grid';
 	import type { Writable } from 'svelte/store';
 	import Piece from './Piece.svelte';

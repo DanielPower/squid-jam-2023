@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { SquidChessActions, SquidChessUserView } from '$lib/server/games/squid_chess';
+	import type { SquidChessActions, SquidChessUserView } from '$lib/games/squid_chess';
 	import { action } from '$lib/util/action';
 	import type { Writable } from 'svelte/store';
 

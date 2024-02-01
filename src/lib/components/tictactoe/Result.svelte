@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { TicTacToeUserView } from '$lib/server/games/tictactoe';
+	import type { TicTacToeUserView } from '$lib/games/tictactoe';
 	import type { Writable } from 'svelte/store';
 	export let gameState: Writable<TicTacToeUserView>;
 </script>
