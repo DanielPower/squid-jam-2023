@@ -9,8 +9,8 @@
 	export let gameState: Writable<SquidChessUserView>;
 </script>
 
-<div class="flex">
-	<div class="flex flex-grow flex-col justify-center items-center gap-3">
+<div class="flex h-full">
+	<div class="flex flex-grow flex-col justify-center items-center gap-12">
 		<Hand {gameState} player="white" />
 		<Board {gameState} />
 		<Hand {gameState} player="black" />

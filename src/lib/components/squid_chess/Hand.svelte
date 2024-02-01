@@ -10,7 +10,6 @@
 	export let player: 'white' | 'black';
 
 	$: hand = $gameState.players[player].hand;
-	$: myHand = player === myColor($gameState);
 	$: hoveredCard = $gameState.players[player].hoveredCard;
 
 	const hoverCard = (cardId: number | null) => {
@@ -23,7 +22,8 @@
 	{#each hand as card, i}
 		<div
 			class="card flex w-32 text-sm"
-			class:hovered={i === hoveredCard}
+			class:hovered-white={player === 'white' && i === hoveredCard}
+			class:hovered-black={player === 'black' && i === hoveredCard}
 			on:mouseenter={() => hoverCard(i)}
 		>
 			{#if card.type === 'hidden'}
@@ -41,8 +41,13 @@
 		transform: scale(1) translateY(0);
 		transition: transform 0.2s;
 	}
-	.card.hovered {
+	.card.hovered-white {
 		transform: scale(1.25) translateY(1rem);
+		transition: transform 0.2s;
+		z-index: 1;
+	}
+	.card.hovered-black {
+		transform: scale(1.25) translateY(-1rem);
 		transition: transform 0.2s;
 		z-index: 1;
 	}
